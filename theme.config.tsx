@@ -5,7 +5,7 @@ const config: DocsThemeConfig = {
   project: {
     link: 'https://github.com/OpenToolCalling/Specification',
   },
-  docsRepositoryBase: 'https://github.com/OpenToolCalling/docs/blob/main',
+  docsRepositoryBase: 'https://github.com/OpenToolCalling/docs/edit/main',
   head: () => {
     return (
       <>
