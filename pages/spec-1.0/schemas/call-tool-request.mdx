@@ -42,7 +42,7 @@ The following examples are non-normative and are provided to illustrate the use 
 
 1. **Calculator.Add**
 
-   A tool call request to add two numbers.
+   A tool call to add two numbers.
 
    ```json
    {
@@ -57,7 +57,7 @@ The following examples are non-normative and are provided to illustrate the use 
 
 2. **Doorbell.Ring (No Output)**
 
-   A tool call request to ring a doorbell.
+   A tool call to ring a doorbell.
 
    ```json
    {
@@ -71,7 +71,7 @@ The following examples are non-normative and are provided to illustrate the use 
 
 3. **System.GetTimestamp (No Input)**
 
-   A tool call request to retrieve the current system timestamp.
+   A tool call to retrieve the current system timestamp.
 
    ```json
    {
@@ -82,7 +82,7 @@ The following examples are non-normative and are provided to illustrate the use 
 
 4. **Gmail.GetEmails (OAuth 2.0 Authorization)**
 
-   A tool call request to retrieve emails from Gmail using OAuth 2.0 for authorization. Before assembling the tool call request, the client must obtain an OAuth 2.0 token for the user.
+   A tool call to retrieve emails from Gmail using OAuth 2.0 for authorization. Before assembling the request, the client must obtain an OAuth 2.0 token for the user.
 
    ```json
    {
@@ -106,7 +106,7 @@ The following examples are non-normative and are provided to illustrate the use 
 
 5. **SMS.Send (Secret Requirement)**
 
-   A tool call request to send an SMS using Twilio, which requires a secret. Before assembling the tool call request, the client obtains a secret from a trusted secret store.
+   A tool call to send an SMS using Twilio, which requires a secret. Before assembling the request, the client obtains a secret from a trusted secret store.
 
    ```json
    {

@@ -8,9 +8,18 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Terminology
 
-- **Agent**: An entity that issues requests to tools for performing specific tasks.
-- **Tool Server**: An entity that hosts a collection of tools and processes tool calls.
 - **Tool**: A service or function that can be invoked by an agent using the defined protocols.
+- **Tool Server**: An entity that hosts a collection of tools and provides a trusted execution environment for executing tools (functions or services).
+- **Agent**: An entity that issues requests to Tool Servers to execute tools.
+
+## Design Principles
+
+The Open Tool Calling standard is designed to be:
+
+- **Familiar**: The standard is designed to feel comfortable to developers who are familiar with REST and JSON.
+- **Interoperable**: The standard is intended to promote interoperability between agents and tools. It is designed to be easy to implement for different languages and frameworks.
+- **Lightweight**: The standard is designed to be lightweight and easy to understand.
+- **Extensible**: The standard is designed to be extensible. New parameters or response types can be added as additional properties in the respective schemas.
 
 ## Editors
 
