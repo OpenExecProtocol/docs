@@ -9,8 +9,12 @@ const config: DocsThemeConfig = {
   head: () => {
     return (
       <>
+        <title>Open Tool Calling</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Open Tool Calling" />
+        <meta
+          name="description"
+          content="The Open Tool Calling specification"
+        />
         <meta name="og:title" content="Open Tool Calling" />
         <meta
           name="og:description"
