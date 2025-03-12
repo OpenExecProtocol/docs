@@ -1,7 +1,7 @@
 {
-  "name": "nextra-docs-template",
-  "version": "0.0.1",
-  "description": "Nextra docs template",
+  "name": "opentoolcalling-docs",
+  "version": "1.0.0",
+  "description": "Open Tool Calling docs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shuding/nextra-docs-template.git"
+    "url": "git+https://github.com/OpenToolCalling/docs.git"
   },
-  "author": "Shu Ding <g@shud.in>",
+  "author": "Arcade.dev <dev@arcade.dev>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shuding/nextra-docs-template/issues"
+    "url": "https://github.com/OpenToolCalling/docs/issues"
   },
-  "homepage": "https://github.com/shuding/nextra-docs-template#readme",
+  "homepage": "https://opentoolcalling.org",
   "dependencies": {
     "@theguild/remark-mermaid": "^0.2.0",
     "next": "^13.0.6",
