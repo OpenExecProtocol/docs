@@ -1,0 +1,239 @@
+# Tool Definition schema
+
+The `ToolDefinition` schema establishes the required and optional fields to describe a tool.
+
+## Schema Fields
+
+### Metadata
+
+- **`id`** (required): A unique identifier for the tool, in the following format: `ToolkitName.ToolName@Version`. For example, `Calculator.Add@1.0.0`. The `id` MUST be unique within the scope of the Tool Server.
+- **`name`** (required): A human-readable name for the tool. For example, `Add` or `Calculator_Add`. The name MUST contain only alphanumeric characters, underscores, and dashes, and be between 1 and 64 characters in length.
+- **`description`** (required): A human-readable explanation of the tool's purpose. This field SHOULD be used by both humans and AI models.
+- **`version`** (required): The semantic version of the tool, e.g. `1.0.0`. Multiple versions of the same tool MAY exist.
+
+Tools MUST be versioned using simple semantic versioning of the form `x.y.z` where `x`, `y`, and `z` are integers.
+
+### Input Schema
+
+- **`input_schema`** (required): Describes the input parameters for the tool.
+
+  - **`parameters`** (required): A JSON Schema object that describes the input parameters for the tool.
+    This schema supports standard JSON Schema validation, but excludes `$ref` and nested definitions/schemas for simplicity.
+
+The `parameters` field MUST be present, and MAY be an empty object. Each parameter in `parameters` MUST be a valid JSON Schema object and MUST contain a `description` field describing the parameter.
+
+### Output Schema
+
+- **`output_schema`** (required): A JSON Schema object that describes the output parameters for the tool.This schema supports standard JSON Schema validation, but excludes $ref and nested definitions/schemas for simplicity.
+
+`output_schema` MAY be an empty object indicating that the tool can return an unconstrained ("any") JSON value, and MAY be `null` indicating that the tool does not return any output.
+
+### Requirements
+
+- **`requirements`** (optional): Describes tool requirements that are not strictly input parameters, such as an API key needed to call a target API, or that a tool requires OAuth 2.0-based authorization.
+
+  - **`authorization`** (optional): Declares one or more required authorization methods, described as an array of objects with the following properties:
+
+    - **`id`**: A unique identifier for the authorization method or authorization provider.
+    - **`oauth2`** (optional): For tools that need OAuth 2.0-based authorization, this field contains the OAuth 2.0-specific authorization details.
+
+      - **`scopes`**: A list of scopes that must be granted for the tool to execute properly.
+
+  - **`secrets`** (optional): Declares one or more secrets, described as an array of objects with the following properties:
+
+    - **`id`**: A unique identifier for the secret.
+
+  - **`user_id`** (optional): A unique identifier for the user, for tools that need user identification or user-based authorization.
+
+## Non-Normative Examples
+
+The following examples are non-normative and are provided to illustrate the use of the `ToolDefinition` schema.
+
+1. **Calculator.Add**
+
+   A tool that adds two numbers.
+
+   ```json
+   {
+     "id": "Calculator.Add@1.0.0",
+     "name": "Calculator_Add",
+     "description": "Adds two numbers together.",
+     "version": "1.0.0",
+     "input_schema": {
+       "parameters": {
+         "type": "object",
+         "properties": {
+           "a": {
+             "type": "number",
+             "description": "The first number to add."
+           },
+           "b": {
+             "type": "number",
+             "description": "The second number to add."
+           }
+         },
+         "required": ["a", "b"]
+       }
+     },
+     "output_schema": {
+       "type": "number",
+       "description": "The sum of the two numbers."
+     }
+   }
+   ```
+
+2. **Doorbell.Ring (No Output)**
+
+   A tool that has an input parameter and produces no output.
+
+   ```json
+   {
+     "id": "Doorbell.Ring@0.1.0",
+     "name": "Doorbell_Ring",
+     "description": "Rings a doorbell given a doorbell ID.",
+     "version": "0.1.0",
+     "input_schema": {
+       "parameters": {
+         "type": "object",
+         "properties": {
+           "doorbell_id": {
+             "type": "string",
+             "description": "The ID of the doorbell to ring."
+           }
+         },
+         "required": ["doorbell_id"]
+       }
+     },
+     "output_schema": null
+   }
+   ```
+
+3. **System.GetTimestamp (No Input)**
+
+   A tool that has no input parameters and produces an output.
+
+   ```json
+   {
+     "id": "System.GetTimestamp@1.0.0",
+     "name": "System_GetTimestamp",
+     "description": "Retrieves the current system timestamp.",
+     "version": "1.0.0",
+     "input_schema": {
+       "parameters": {
+         "type": "object"
+       }
+     },
+     "output_schema": {
+       "type": "object",
+       "properties": {
+         "timestamp": {
+           "type": "string",
+           "format": "date-time",
+           "description": "The current system timestamp."
+         }
+       },
+       "required": ["timestamp"]
+     }
+   }
+   ```
+
+4. **Gmail.GetEmails (OAuth 2.0 Authorization)**
+
+   A tool that retrieves emails from Gmail using OAuth 2.0 for authorization.
+
+   ```json
+   {
+     "id": "Gmail.GetEmails@1.2.0",
+     "name": "Gmail_GetEmails",
+     "description": "Retrieves emails from Gmail using OAuth 2.0 authentication.",
+     "version": "1.2.0",
+     "input_schema": {
+       "parameters": {
+         "type": "object",
+         "properties": {
+           "query": {
+             "type": "string",
+             "description": "Search query for filtering emails."
+           }
+         },
+         "required": []
+       }
+     },
+     "output_schema": {
+       "type": "object",
+       "properties": {
+         "emails": {
+           "type": "array",
+           "items": {
+             "type": "object",
+             "properties": {
+               "id": { "type": "string" },
+               "subject": { "type": "string" },
+               "snippet": { "type": "string" }
+             },
+             "required": ["id", "subject", "snippet"]
+           },
+           "description": "List of retrieved emails."
+         }
+       },
+       "required": ["emails"]
+     },
+     "requirements": {
+       "authorization": [
+         {
+           "id": "google",
+           "oauth2": {
+             "scopes": ["https://www.googleapis.com/auth/gmail.readonly"]
+           }
+         }
+       ],
+       "user_id": true
+     }
+   }
+   ```
+
+5. **SMS.Send (Secret Requirement)**
+
+   A tool that sends SMS messages using Twilio and requires a `TWILIO_API_KEY` secret.
+
+   ```json
+   {
+     "id": "SMS.Send@0.1.2",
+     "name": "SMS_Send",
+     "description": "Sends SMS messages using Twilio.",
+     "version": "0.1.2",
+     "input_schema": {
+       "parameters": {
+         "type": "object",
+         "properties": {
+           "to": {
+             "type": "string",
+             "description": "Recipient phone number."
+           },
+           "message": {
+             "type": "string",
+             "description": "Message content to send."
+           }
+         },
+         "required": ["to", "message"]
+       }
+     },
+     "output_schema": {
+       "type": "object",
+       "properties": {
+         "status": {
+           "type": "string",
+           "description": "Status of the SMS sending operation."
+         }
+       },
+       "required": ["status"]
+     },
+     "requirements": {
+       "secrets": [
+         {
+           "id": "TWILIO_API_KEY"
+         }
+       ]
+     }
+   }
+   ```

@@ -1,0 +1,40 @@
+# Versioning
+
+The Open Tool Calling standard defines a versioning mechanism for the protocol messages exchanged between clients and tool servers.
+
+## Schema Versioning
+
+The [OpenAPI schema](https://github.com/OpenToolCalling/Specification/tree/main/spec/http/1.0/openapi.json) is versioned using [semantic versioning](https://semver.org/):
+
+1. Changes that break backward compatibility MUST be versioned as a new major version.
+2. Changes that add functionality in a backwards-compatible manner MUST be versioned as a new minor version.
+
+## Protocol Message Versioning
+
+The `$schema` field is used in requests and responses to indicate the version of the OTC standard that the client supports. The schema URI MUST be a valid URI.
+
+If the `$schema` field is not included, the server MUST assume the client supports the latest version of the OTC standard supported by the server.
+
+For example, the following request indicates that the client supports this version (1.0) of the OTC standard:
+
+```json
+{
+  "$schema": "https://github.com/OpenToolCalling/Specification/tree/main/spec/http/1.0/openapi.json"
+}
+```
+
+### Shorthand Versioning
+
+To reduce the size of the `$schema` field, the client MAY use a shorthand version of the form:
+
+```
+otc://<major>.<minor>
+```
+
+For example, the following request indicates that the client supports this version (1.0) of the OTC standard:
+
+```json
+{
+  "$schema": "otc://1.0"
+}
+```

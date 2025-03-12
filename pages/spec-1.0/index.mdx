@@ -1,0 +1,28 @@
+# Introduction
+
+The Open Tool Calling (OTC) standard establishes a set of protocols and formats to facilitate communication between agents (clients) and tools (functions or services) in distributed systems. It ensures that tool definitions, requests, and responses adhere to a structured and open standard.
+
+This document defines the structures and protocols used to describe tools, initiate tool calls, and process responses. The standard consists of a set of JSON schemas that govern tool definitions, tool requests, and tool responses as described in the [OpenAPI spec](https://spec.openapis.org/registry-metadata/openapi-extensions). It aims to provide a unified, extensible, and interoperable framework for client-to-tool interactions.
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP 14](https://datatracker.ietf.org/doc/html/bcp14) [[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)] [[RFC8174](https://datatracker.ietf.org/doc/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.
+
+## Terminology
+
+- **Tool**: A service or function that can be invoked by an agent using the defined protocols.
+- **Tool Server**: An entity that hosts a collection of tools and provides a trusted execution environment for executing tools (functions or services).
+- **Agent**: An entity that issues requests to Tool Servers to execute tools.
+
+## Design Principles
+
+The Open Tool Calling standard is designed to be:
+
+- **Familiar**: The standard is designed to feel comfortable to developers who are familiar with REST and JSON.
+- **Interoperable**: The standard is intended to promote interoperability between agents and tools. It is designed to be easy to implement for different languages and frameworks.
+- **Lightweight**: The standard is designed to be lightweight and easy to understand.
+- **Extensible**: The standard is designed to be extensible. New parameters or response types can be added as additional properties in the respective schemas.
+
+## Editors
+
+- Nate Barbettini ([@nbarbettini](https://github.com/nbarbettini))
+- Eugene Yurtsev ([@eyurtsev](https://github.com/eyurtsev))
+- Sam Partee ([@spartee](https://github.com/spartee))

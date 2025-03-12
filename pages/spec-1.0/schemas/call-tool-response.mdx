@@ -1,0 +1,147 @@
+# Call Tool Response schema
+
+The `CallToolResponse` schema defines the structured data returned from a tool call.
+
+## Schema ields
+
+### Execution Metadata
+
+- **`call_id`**: A unique identifier for this call. If `call_id` is not present in the [request](call-tool-request), the server MUST generate one and return it in the response.
+- **`success`**: Boolean flag indicating the success or failure of the call.
+- **`duration`** (optional): Call time in milliseconds.
+
+### Output Content
+
+The output can take one of several forms:
+
+1. **Null Response**: Contains execution metadata only.
+2. **Value Response**: Contains execution metadata and a `value` field that MUST be a JSON value, array, or object conforming to the [output schema](tool-definition#output-schema) of the tool.
+3. **Error Response**: Contains execution metadata and an `error` object with:
+   - **`message`**: A user-facing error message.
+   - **`developer_message`** (optional): Detailed error information for internal debugging.
+   - **`can_retry`** (optional): Indicates if the request can be retried by the client. If unspecified, the client MUST assume the request cannot be retried (`false`).
+   - **`additional_prompt_content`** (optional): Extra content to be used for retry prompts.
+   - **`retry_after_ms`** (optional): Suggested delay before retrying.
+
+The `CallToolResponse` schema ensures that every response provides clear and actionable information regarding the outcome of the tool call, regardless of whether the tool's function or service code executed successfully or not.
+
+## Non-Normative Examples
+
+The following examples are non-normative and are provided to illustrate the use of the `CallToolResponse` schema.
+
+1. **Calculator.Add (Success)**
+
+   A response for a tool call to add two numbers.
+
+   ```json
+   {
+     "call_id": "123e4567-e89b-12d3-a456-426614174000",
+     "duration": 50,
+     "success": true,
+     "value": 15
+   }
+   ```
+
+2. **Doorbell.Ring (Success, No Output)**
+
+   A response for a tool call to ring a doorbell that does not return any output.
+
+   ```json
+   {
+     "call_id": "223e4567-e89b-12d3-a456-426614174001",
+     "duration": 30,
+     "success": true,
+     "value": null
+   }
+   ```
+
+3. **System.GetTimestamp (Success)**
+
+   A response for a tool call that retrieves the current system timestamp.
+
+   ```json
+   {
+     "call_id": "323e4567-e89b-12d3-a456-426614174002",
+     "duration": 25,
+     "success": true,
+     "value": {
+       "timestamp": "2023-10-05T12:00:00Z"
+     }
+   }
+   ```
+
+4. **Gmail.GetEmails (Success)**
+
+   A successful response for a Gmail tool call that returns a list of emails.
+
+   ```json
+   {
+     "call_id": "423e4567-e89b-12d3-a456-426614174003",
+     "duration": 120,
+     "success": true,
+     "value": {
+       "emails": [
+         {
+           "id": "email_1",
+           "subject": "Welcome to Gmail",
+           "snippet": "Hello, welcome to your inbox!"
+         },
+         {
+           "id": "email_2",
+           "subject": "Your Receipt",
+           "snippet": "Thank you for your purchase..."
+         }
+       ]
+     }
+   }
+   ```
+
+5. **SMS.Send (Success)**
+
+   A successful response for a tool call that sends an SMS.
+
+   ```json
+   {
+     "call_id": "523e4567-e89b-12d3-a456-426614174004",
+     "duration": 80,
+     "success": true,
+     "value": {
+       "status": "sent"
+     }
+   }
+   ```
+
+6. **Error Response**
+
+   A tool call error response that includes both a user-facing message and an internal developer message.
+
+   ```json
+   {
+     "call_id": "623e4567-e89b-12d3-a456-426614174005",
+     "duration": 40,
+     "success": false,
+     "error": {
+       "message": "Could not reach the server. Please try again later.",
+       "developer_message": "The host api.example.com is not reachable (ECONNREFUSED)"
+     }
+   }
+   ```
+
+7. **Error Response with Additional Prompt Content**
+
+   An error response that offers additional context and retry guidance to the client.
+
+   ```json
+   {
+     "call_id": "723e4567-e89b-12d3-a456-426614174006",
+     "duration": 60,
+     "success": false,
+     "error": {
+       "message": "Doorbell ID not found",
+       "developer_message": "The doorbell with ID 'doorbell1' does not exist.",
+       "can_retry": true,
+       "additional_prompt_content": "ids: doorbell42,doorbell84",
+       "retry_after_ms": 500
+     }
+   }
+   ```

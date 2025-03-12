@@ -1,0 +1,24 @@
+# Error schemas
+
+The OTC standard defines several error schemas that are used to represent errors in the Open Tool Calling protocol, specifically in the [Call Tool](../protocol/call-tool) protocol.
+
+## Server Error Response
+
+The `ServerErrorResponse` schema is used to represent errors that occur before the tool is called.
+These errors typically indicate issues such as authentication failures or configuration problems. The schema includes:
+
+- **`$schema`** (optional): The URI for the schema definition.
+- **`message`** (required): A descriptive error message. `message` SHOULD be a user-facing error message.
+- **`developer_message`** (optional): Additional internal details for debugging purposes. `developer_message` SHOULD NOT be shown to the user or an AI model.
+
+## Input Validation Error Response
+
+The `ValidationErrorResponse` schema is used to represent errors that occur when the input parameters for a tool call are invalid. This schema includes:
+
+- **`$schema`** (optional): The URI for the schema definition.
+- **`message`** (required): A descriptive error message. `message` SHOULD be a user-facing error message.
+- **`parameter_errors`** (optional): A map associating parameter names with their respective error messages to help pinpoint issues in the input data.
+
+## Tool Execution Errors
+
+See the [Call Tool Response](call-tool-response) schema for details.

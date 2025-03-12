@@ -1,0 +1,33 @@
+# Health Check
+
+An Open Tool Calling server MUST implement a health check endpoint that returns a 200 OK response if the server is healthy.
+
+## Flow Details
+
+**Request:**
+
+- **Method:** GET
+- **Endpoint:** `/health`
+- **Security:** No authentication is required.
+
+**Response:**
+
+- **Status Code:** 200 OK
+
+If the server is ready to receive tool calls, the server MUST return a 200 OK response. The server MAY return an HTTP 503 response if it is not ready to receive tool calls.
+
+## Non-Normative Example
+
+The following example is provided to illustrate the use of the health check endpoint:
+
+**Request**
+
+```http
+GET /health HTTP/1.1
+```
+
+**Response**
+
+```http
+HTTP/1.1 200 OK
+```

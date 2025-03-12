@@ -1,0 +1,128 @@
+# Call Tool Request schema
+
+The `CallToolRequest` schema encapsulates the details of a tool call (execution request).
+
+## Schema Fields
+
+### Run and Execution Identification
+
+- **`tool_id`**: The unique identifier of the tool to call.
+- **`call_id`** (optional): A unique identifier and idempotency key for this tool call.
+  If not provided, the server will generate one and return it in the response.
+- **`trace_id`** (optional): Unique trace or span identifier for tracing purposes..
+
+### Input Parameters
+
+- **`inputs`**: An unconstrained object containing the parameters needed by the tool.
+
+### Context
+
+If the `requirements` field is present on a given [tool definition](tool-definition),
+the client MUST provide the required information in the `context` field when calling the tool.
+See the [call tool flow](../flows/call-tool) section for more details.
+
+- **`context`** (optional): Provides additional execution context, consisting of:
+  - **`authorization`** (optional): Contains tokens for authentication, described as an array of objects with the following properties:
+    - **`id`**: The unique identifier for the authorization method or authorization provider.
+    - **`token`**: The authorization token.
+  - **`secrets`** (optional): Contains secrets for the tool call, described as an array of objects with the following properties:
+    - **`id`**: The unique identifier for the secret.
+    - **`value`**: The secret value.
+  - **`user_id`** (optional): The unique identifier for the user.
+
+If the `requirements.authorization` field is present on a given tool definition, the client MUST provide the required authorization information in the `context.authorization` field when [calling the tool](../flows/call-tool).
+
+If the `requirements.secrets` field is present on a given tool definition, the client MUST provide the required secrets in `context.secrets` field when [calling the tool](../flows/call-tool).
+
+If the `requirements.user_id` field is `true` on a given tool definition, the client MUST provide the required user ID in `context.user_id` field when [calling the tool](../flows/call-tool).
+
+## Non-Normative Examples
+
+The following examples are non-normative and are provided to illustrate the use of the `CallToolRequest` schema.
+
+1. **Calculator.Add**
+
+   A tool call to add two numbers.
+
+   ```json
+   {
+     "tool_id": "Calculator.Add@1.0.0",
+     "call_id": "123e4567-e89b-12d3-a456-426614174000",
+     "input": {
+       "a": 10,
+       "b": 5
+     }
+   }
+   ```
+
+2. **Doorbell.Ring (No Output)**
+
+   A tool call to ring a doorbell.
+
+   ```json
+   {
+     "tool_id": "Doorbell.Ring@0.1.0",
+     "call_id": "223e4567-e89b-12d3-a456-426614174001",
+     "input": {
+       "doorbell_id": "doorbell42"
+     }
+   }
+   ```
+
+3. **System.GetTimestamp (No Input)**
+
+   A tool call to retrieve the current system timestamp.
+
+   ```json
+   {
+     "tool_id": "System.GetTimestamp@1.0.0",
+     "call_id": "323e4567-e89b-12d3-a456-426614174002"
+   }
+   ```
+
+4. **Gmail.GetEmails (OAuth 2.0 Authorization)**
+
+   A tool call to retrieve emails from Gmail using OAuth 2.0 for authorization. Before assembling the request, the client must obtain an OAuth 2.0 token for the user.
+
+   ```json
+   {
+     "tool_id": "Gmail.GetEmails@1.2.0",
+     "call_id": "423e4567-e89b-12d3-a456-426614174003",
+     "trace_id": "trace_123",
+     "input": {
+       "query": "is:unread"
+     },
+     "context": {
+       "authorization": [
+         {
+           "id": "google",
+           "token": "ya29.a0AfH6SMC..."
+         }
+       ],
+       "user_id": "user_123"
+     }
+   }
+   ```
+
+5. **SMS.Send (Secret Requirement)**
+
+   A tool call to send an SMS using Twilio, which requires a secret. Before assembling the request, the client obtains a secret from a trusted secret store.
+
+   ```json
+   {
+     "tool_id": "SMS.Send@0.1.2",
+     "call_id": "523e4567-e89b-12d3-a456-426614174004",
+     "input": {
+       "to": "+5556051234567",
+       "message": "Hello from Open Tool Calling!"
+     },
+     "context": {
+       "secrets": [
+         {
+           "id": "TWILIO_API_KEY",
+           "value": "TWILIO_SECRET_VALUE"
+         }
+       ]
+     }
+   }
+   ```

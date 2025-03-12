@@ -1,0 +1,32 @@
+## Tool Authorization
+
+Tool authorization describes how the server authorizes the tool call: given a tool's definition, whether the client needs to authorize the user before calling the tool.
+
+Tools MAY require token-based or other forms of authorization, as specified in the `requirements.authorization` field of the [Tool Definition schema](../schemas/tool-definition).
+
+If the `requirements` field is NOT present, the server MUST allow the tool to be executed without passing any additional information.
+
+When a given tool describes authorization requirements in the `requirements.authorization` field, the client MUST resolve (or delegate to a trusted intermediary) the authorization requirements and provide the necessary credentials (e.g. a token) in the [Call Tool Request](../schemas/call-tool-request), before calling the tool.
+
+If the client does not provide a valid token in the Call Tool Request for a tool that requires authorization, the server MUST return a 400 Bad Request response as described in the [Call Tool (Server Errors)](../protocol/call-tool#server-errors) section.
+
+### Non-Normative Example: Tool Authorization Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client
+    participant AS as Authorization Server
+    participant S as Tool Server
+    participant T as Tool
+
+    U->>C: Input: "Read my recent emails"<br/>user_id: bob@example.com
+    Note over C: Tool Gmail.GetEmails has an authorization requirement:<br/>id: google<br/>scopes: [https://www.googleapis.com/auth/gmail.readonly]
+    C-->>AS: OAuth 2.0 request
+    AS-->>C: Scoped token for user
+    C->>S: Call tool Gmail.GetEmails with token
+    S->>T: Run tool (function)
+    T->>S: Return tool response
+    S->>C: Return tool response
+
+```

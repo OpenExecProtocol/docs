@@ -1,9 +1,6 @@
 {
-    "index": "Introduction",
-    "contact": {
-        "title": "Specification ↗",
-        "type": "page",
-        "href": "https://github.com/opentoolcalling/specification",
-        "newWindow": true
-    }
+  "index": "About Open Tool Calling",
+  "spec-1.0": {
+    "title": "Specification (1.0)"
+  }
 }
