@@ -1,0 +1,241 @@
+# Call Tool
+
+Clients initiate tool execution by sending a POST request to the `/tools/call` endpoint.
+This flow lets clients call a tool and receive its output, with the request and response bodies conforming to the [Call Tool Request](../schemas/call-tool-request) and [Call Tool Response](../schemas/call-tool-response) schemas.
+
+## Flow Details
+
+**Request:**
+
+- **Method:** POST
+- **Endpoint:** `/tools/call`
+- **Security:** Servers MAY require bearer authentication (JWT). Servers that are internet-facing SHOULD require authentication.
+- **Payload:** A JSON document containing:
+  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of the OTC standard that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of the OTC standard.
+  - **`request` Object:** A JSON document following the [Call Tool Request](../schemas/call-tool-request) schema.
+
+**Response (Tool Execution):**
+
+- **Status Code:** 200 OK
+- **Content:** A JSON document following the [Call Tool Response](../schemas/call-tool-response) schema. The server MUST return a 200 response even if the tool call fails.
+
+**Response (Server Error):**
+
+- **Status Code:** 400
+- **Content:** A JSON document following the `ServerErrorResponse` schema.
+
+**Response (Input Validation Error):**
+
+- **Status Code:** 422
+- **Content:** A JSON document following the `ValidationErrorResponse` schema.
+
+## Tool Version Resolution
+
+A Tool Server MAY support multiple versions of a given tool, to allow clients to opt-in to new versions while preserving backwards compatibility.
+
+When a client calls a tool using a `tool_id` that includes a version (e.g. `Calculator.Add@1.0.0`), the server MUST resolve the version of the tool to call using the following rules:
+
+1. Default Semantic Versioning: If a tool version is present in the tool ID and is of the form `x.y.z` where `x`, `y`, and `z` are integers, the server MUST use the exact version specified. For example, `Calculator.Add@1.0.0`.
+2. Shorthand Versioning: If a tool version is present in the tool ID and is of the form `x` where `x` is an integer, the server MUST use the version `x.0.0`. For example, `Calculator.Add@1` which resolves to `Calculator.Add@1.0.0`.
+3. Implied Latest Version: If no tool version is present in the tool ID, the server MUST use the latest version of the tool.
+
+## Error Behavior
+
+Servers MUST differentiate between:
+
+1. Errors that occur before the tool is called ("Server Errors").
+2. Input validation errors ("Input Validation Errors").
+3. Errors that occur during execution of the tool ("Tool Execution Errors").
+
+### Server Errors
+
+If an error occurs before the tool is called that is not related to input validation, the server MUST return a 400 response conforming to the [Server Error Response](../schemas/errors#servererrorresponse) schema. Examples of such errors include:
+
+- The tool server is temporarily unavailable.
+- The requested version of the OTC standard is not supported.
+- The requested tool ID is invalid or cannot be found.
+- The requested tool version is not available.
+- The tool server requires authentication, but the client did not provide valid credentials.
+
+The `message` field MUST be present and SHOULD be a user-facing error message. The `developer_message` field MAY be present and SHOULD be an internal message that can be logged but will not be shown to the user or an AI model.
+
+### Input Validation Errors
+
+When a valid tool ID and version are provided, servers MUST validate the input parameters against the tool's `input_schema` before calling the tool.
+
+If the input parameters are invalid, the server MUST return a 422 response conforming to the [Validation Error Response](../schemas/errors#validationerrorresponse) schema. Servers MAY return a `parameter_errors` object that maps parameter names to error messages.
+
+### Tool Execution Errors
+
+If an error occurs during execution of a tool, the server MUST return a 200 response conforming to the [Call Tool Response](../schemas/call-tool-response) schema, with a `success: false` and an `error` object.
+
+## Retrying Errors
+
+If `can_retry` is `true`, the client SHOULD retry the tool call. If `retry_after_ms` is present, the client SHOULD wait for the specified number of milliseconds before retrying the tool call.
+
+If `additional_prompt_content` is present, the client MAY use it to provide additional context to the AI model when prompting it to retry the tool call. For example, the tool may return a list of suggested values that are close to the given input.
+
+## Non-Normative Examples
+
+The following examples are non-normative and are provided to illustrate the use of the call tool endpoint.
+
+### Successful Execution
+
+**Request**
+
+```http
+POST /call HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "$schema": "otc://1.0",
+  "request": {
+    "call_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tool_id": "Calculator.Add@1.0.0",
+    "input": {
+      "a": 10,
+      "b": 5
+    }
+  }
+}
+```
+
+**Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "$schema": "otc://1.0",
+  "result": {
+    "call_id": "123e4567-e89b-12d3-a456-426614174000",
+    "duration": 2,
+    "success": true,
+    "value": 15
+  }
+}
+```
+
+### Server Error
+
+In this example, the tool call fails because the tool version is not found.
+
+**Request**
+
+```http
+POST /call HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "$schema": "otc://1.0",
+  "request": {
+    "call_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tool_id": "Calculator.Add@2.0.0"
+  }
+}
+```
+
+**Response**
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "$schema": "otc://1.0",
+  "message": "Tool 'Calculator_Add' was not found",
+  "developer_message": "Calculator.Add version 2.0.0 is not available"
+}
+```
+
+### Input Validation Error
+
+In this example, the tool call fails because the second input parameter is not a number. The server catches this before calling the tool, and returns a 422 response with a `parameter_errors` object that maps the parameter name to an error message.
+
+**Request**
+
+```http
+POST /call HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "$schema": "otc://1.0",
+  "request": {
+    "call_id": "123e4567-e89b-12d3-a456-426614174000",
+    "tool_id": "Calculator.Add@1.0.0",
+    "input": {
+      "a": 10,
+      "b": "infinity"
+    }
+  }
+}
+```
+
+**Response**
+
+```http
+HTTP/1.1 422 Unprocessable Entity
+Content-Type: application/json
+
+{
+  "$schema": "otc://1.0",
+  "message": "Some input parameters are invalid",
+  "parameter_errors": {
+    "b": "Must be a number"
+  }
+}
+```
+
+### Tool Execution Error
+
+In this example, the tool call fails because the doorbell ID is not found. The tool opts to send back information to the client to help it retry the tool call.
+
+**Request**
+
+```http
+POST /call HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "$schema": "otc://1.0",
+  "request": {
+    "call_id": "723e4567-e89b-12d3-a456-426614174006",
+    "tool_id": "Doorbell.Ring@0.1.0",
+    "input": {
+      "doorbell_id": "doorbell1"
+    }
+  }
+}
+```
+
+**Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "$schema": "https://github.com/ArcadeAI/OpenToolCalling/tree/main/specification/http/1.0/openapi.json",
+  "result": {
+     "call_id": "723e4567-e89b-12d3-a456-426614174006",
+     "duration": 60,
+     "success": false,
+     "error": {
+       "message": "Doorbell ID not found",
+       "developer_message": "The doorbell with ID 'doorbell1' does not exist.",
+       "can_retry": true,
+       "additional_prompt_content": "ids: doorbell42,doorbell84",
+       "retry_after_ms": 500
+     }
+   }
+}
+```

@@ -1,17 +1,14 @@
-import { DocsThemeConfig } from "nextra-theme-docs";
+import { DocsThemeConfig } from 'nextra-theme-docs';
 
 const config: DocsThemeConfig = {
-    logo: <span>Open Tool Calling</span>,
-    project: {
-        link: "https://github.com/opentoolcalling/specification",
-    },
-    chat: {
-        link: "https://discord.com",
-    },
-    docsRepositoryBase: "https://github.com/opentoolcalling/docs",
-    footer: {
-        text: "Open Tool Calling",
-    },
+  logo: <span>opentoolcalling.org</span>,
+  project: {
+    link: 'https://github.com/OpenToolCalling/Specification',
+  },
+  docsRepositoryBase: 'https://github.com/OpenToolCalling/docs',
+  footer: {
+    text: 'Open Tool Calling',
+  },
 };
 
 export default config;

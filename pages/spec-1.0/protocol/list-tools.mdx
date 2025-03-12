@@ -1,0 +1,94 @@
+# List Tools
+
+Clients perform tool discovery by retrieving tool definitions from the Tool Server using the `/tools` endpoint. This protocol provides a catalog of tools that the client can use, all of which conform to the [`ToolDefinition` schema](../schemas/tool-definition).
+
+## Flow Details
+
+**Request:**
+
+- **Method:** GET
+- **Endpoint:** `/tools`
+- **Security:** Servers MAY require bearer authentication (JWT). Servers that are internet-facing SHOULD require authentication.
+- **Payload:** A JSON document containing:
+  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of the OTC standard that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of the OTC standard.
+
+**Response:**
+
+- **Status Code:** 200 OK
+  - **Content:** A JSON object that includes a `$schema` URI reference (indicating the [OTC version](../versioning)) and a `tools` array. Each element in the array is a complete [Tool Definition](../schemas/tool-definition). If there are no tools available, the `tools` array MUST be empty.
+
+## Non-Normative Example
+
+The following example is provided to illustrate the use of the tool discovery endpoint:
+
+**Request**
+
+```http
+GET /tools HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Response (No Tools)**
+
+```json
+{
+  "$schema": "otc://1.0",
+  "tools": []
+}
+```
+
+**Response (With Tools)**
+
+```json
+{
+  "$schema": "otc://1.0",
+  "tools": [
+    {
+      "id": "Calculator.Add@1.0.0",
+      "name": "Calculator_Add",
+      "description": "Adds two numbers together.",
+      "version": "1.0.0",
+      "input_schema": {
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "number",
+              "description": "The first number to add."
+            },
+            "b": {
+              "type": "number",
+              "description": "The second number to add."
+            }
+          },
+          "required": ["a", "b"]
+        }
+      },
+      "output_schema": {
+        "type": "number",
+        "description": "The sum of the two numbers."
+      }
+    },
+    {
+      "id": "Doorbell.Ring@0.1.0",
+      "name": "Doorbell_Ring",
+      "description": "Rings a doorbell given a doorbell ID.",
+      "version": "0.1.0",
+      "input_schema": {
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "doorbell_id": {
+              "type": "string",
+              "description": "The ID of the doorbell to ring."
+            }
+          },
+          "required": ["doorbell_id"]
+        }
+      },
+      "output_schema": null
+    }
+  ]
+}
+```

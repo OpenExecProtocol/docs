@@ -1,0 +1,61 @@
+# Server Authentication
+
+Server authentication describes how the server authenticates the client: which clients are allowed to make OTC requests to the Tool Server.
+
+Servers that are internet-facing SHOULD require authentication.
+
+## Authentication Methods
+
+### No Authentication
+
+If a server is configured to not require authentication, the server MUST ignore the `Authorization` header.
+
+### API Key Authentication
+
+A static API key is a simple shared secret that both the client and server know. This method provides simple authentication with minimal implementation complexity.
+
+Requirements:
+
+- The client MUST include the API key in the `OTC-API-Key` HTTP header with each request.
+- Servers that support this authentication method MUST validate the API key against their stored value.
+- Clients and servers MUST transmit API keys only over secure connections (HTTPS).
+- Servers MUST reject requests with missing or invalid API keys with a 401 Unauthorized HTTP response.
+- API keys SHOULD be generated with sufficient entropy (recommended minimum 32 bytes) and SHOULD be treated as sensitive information.
+
+#### Non-Normative Example: API Key\*\*
+
+```http
+GET /tools HTTP/1.1
+Host: api.example.com
+OTC-API-Key: ahf62jd81hdk19akqnd62hdka
+```
+
+### JWT Bearer Token Authentication
+
+JSON Web Tokens (JWTs) as described in [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519) provide a more secure authentication mechanism that doesn't require sending the shared secret with each request.
+
+Requirements:
+
+- The client MUST include a valid JWT in the `Authorization` HTTP header using the Bearer scheme.
+- The client MUST sign the JWT using the shared secret key using the HS256 algorithm.
+- The server MUST validate the JWT signature using the shared secret key.
+- The JWT MUST include the `exp` claim, which SHOULD be no more than 15 minutes in the future.
+- Servers MUST reject requests with missing, invalid, or expired JWTs with a 401 Unauthorized HTTP response.
+- The JWT MAY include the `aud` claim. If the `aud` claim is present, the server MUST validate it against the server's allowed client list.
+- Servers SHOULD enforce a reasonably short expiration time for JWTs to limit potential damage from token exposure.
+
+#### Non-Normative Example: JWT Bearer Token
+
+```http
+GET /tools HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJvdGNzZXJ2ZXIiLCJleHAiOjE3NDE3MjQyMTl9.FPIFSSUmngbyePKghI54zUJ-dUxCrh4ZnP9TId5zk34
+```
+
+## Selecting an Authentication Method
+
+Servers MUST document which authentication methods they support. Servers MAY support multiple authentication methods simultaneously.
+
+Clients SHOULD prefer JWT Bearer token authentication over static API key authentication when both are available, due to its enhanced security properties.
+
+For highly sensitive operations or production environments, servers SHOULD consider implementing additional security measures beyond these basic authentication methods, such as IP allowlisting, rate limiting, or more sophisticated authentication protocols.
