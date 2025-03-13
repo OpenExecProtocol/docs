@@ -6,8 +6,8 @@ The `CallToolResponse` schema defines the structured data returned from a tool c
 
 ### Execution Metadata
 
-- **`call_id`** (string): A unique identifier for this call. If `call_id` is not present in the [request](call-tool-request), the server MUST generate one and return it in the response.
-- **`success`** (boolean): Boolean flag indicating the success or failure of the call.
+- **`call_id`** (string, required): A unique identifier for this call. If `call_id` is not present in the [request](call-tool-request), the server MUST generate one and return it in the response.
+- **`success`** (boolean, required): Boolean flag indicating the success or failure of the call.
 - **`duration`** (number, optional): Call time in milliseconds.
 
 ### Output Content
