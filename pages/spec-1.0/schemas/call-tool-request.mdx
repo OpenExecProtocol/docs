@@ -19,7 +19,7 @@ The `CallToolRequest` schema encapsulates the details of a tool call (execution 
 
 If the `requirements` field is present on a given [tool definition](tool-definition),
 the client MUST provide the required information in the `context` field when calling the tool.
-See the [call tool flow](../flows/call-tool) section for more details.
+See the [call tool flow](../protocol/call-tool) section for more details.
 
 - **`context`** (optional): Provides additional execution context, consisting of:
   - **`authorization`** (optional): Contains tokens for authentication, described as an array of objects with the following properties:
@@ -30,11 +30,11 @@ See the [call tool flow](../flows/call-tool) section for more details.
     - **`value`**: The secret value.
   - **`user_id`** (optional): The unique identifier for the user.
 
-If the `requirements.authorization` field is present on a given tool definition, the client MUST provide the required authorization information in the `context.authorization` field when [calling the tool](../flows/call-tool).
+If the `requirements.authorization` field is present on a given tool definition, the client MUST provide the required authorization information in the `context.authorization` field when [calling the tool](../protocol/call-tool).
 
-If the `requirements.secrets` field is present on a given tool definition, the client MUST provide the required secrets in `context.secrets` field when [calling the tool](../flows/call-tool).
+If the `requirements.secrets` field is present on a given tool definition, the client MUST provide the required secrets in `context.secrets` field when [calling the tool](../protocol/call-tool).
 
-If the `requirements.user_id` field is `true` on a given tool definition, the client MUST provide the required user ID in `context.user_id` field when [calling the tool](../flows/call-tool).
+If the `requirements.user_id` field is `true` on a given tool definition, the client MUST provide the required user ID in `context.user_id` field when [calling the tool](../protocol/call-tool).
 
 ## Non-Normative Examples
 
