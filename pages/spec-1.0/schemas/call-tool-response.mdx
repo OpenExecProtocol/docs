@@ -6,9 +6,9 @@ The `CallToolResponse` schema defines the structured data returned from a tool c
 
 ### Execution Metadata
 
-- **`call_id`**: A unique identifier for this call. If `call_id` is not present in the [request](call-tool-request), the server MUST generate one and return it in the response.
-- **`success`**: Boolean flag indicating the success or failure of the call.
-- **`duration`** (optional): Call time in milliseconds.
+- **`call_id`** (string, required): A unique identifier for this call. If `call_id` is not present in the [request](call-tool-request), the server MUST generate one and return it in the response.
+- **`success`** (boolean, required): Boolean flag indicating the success or failure of the call.
+- **`duration`** (number, optional): Call time in milliseconds.
 
 ### Output Content
 
@@ -17,11 +17,11 @@ The output can take one of several forms:
 1. **Null Response**: Contains execution metadata only.
 2. **Value Response**: Contains execution metadata and a `value` field that MUST be a JSON value, array, or object conforming to the [output schema](tool-definition#output-schema) of the tool.
 3. **Error Response**: Contains execution metadata and an `error` object with:
-   - **`message`**: A user-facing error message.
-   - **`developer_message`** (optional): Detailed error information for internal debugging.
-   - **`can_retry`** (optional): Indicates if the request can be retried by the client. If unspecified, the client MUST assume the request cannot be retried (`false`).
-   - **`additional_prompt_content`** (optional): Extra content to be used for retry prompts.
-   - **`retry_after_ms`** (optional): Suggested delay before retrying.
+   - **`message`** (string): A user-facing error message.
+   - **`developer_message`** (string, optional): Detailed error information for internal debugging.
+   - **`can_retry`** (boolean, optional): Indicates if the request can be retried by the client. If unspecified, the client MUST assume the request cannot be retried (`false`).
+   - **`additional_prompt_content`** (string, optional): Extra content to be used for retry prompts.
+   - **`retry_after_ms`** (number, optional): How long to wait before retrying the call (in milliseconds).
 
 The `CallToolResponse` schema ensures that every response provides clear and actionable information regarding the outcome of the tool call, regardless of whether the tool's function or service code executed successfully or not.
 

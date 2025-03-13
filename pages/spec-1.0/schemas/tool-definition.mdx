@@ -6,16 +6,16 @@ The `ToolDefinition` schema establishes the required and optional fields to desc
 
 ### Metadata
 
-- **`id`** (required): A unique identifier for the tool, in the following format: `ToolkitName.ToolName@Version`. For example, `Calculator.Add@1.0.0`. The `id` MUST be unique within the scope of the Tool Server.
-- **`name`** (required): A human-readable name for the tool. For example, `Add` or `Calculator_Add`. The name MUST contain only alphanumeric characters, underscores, and dashes, and be between 1 and 64 characters in length.
-- **`description`** (required): A human-readable explanation of the tool's purpose. This field SHOULD be used by both humans and AI models.
-- **`version`** (required): The semantic version of the tool, e.g. `1.0.0`. Multiple versions of the same tool MAY exist.
+- **`id`** (string, required): A unique identifier for the tool, in the following format: `ToolkitName.ToolName@Version`. For example, `Calculator.Add@1.0.0`. The `id` MUST be unique within the scope of the Tool Server.
+- **`name`** (string, required): A human-readable name for the tool. For example, `Add` or `Calculator_Add`. The name MUST contain only alphanumeric characters, underscores, and dashes, and be between 1 and 64 characters in length.
+- **`description`** (string, required): A human-readable explanation of the tool's purpose. This field SHOULD be used by both humans and AI models.
+- **`version`** (string, required): The semantic version of the tool, e.g. `1.0.0`. Multiple versions of the same tool MAY exist.
 
 Tools MUST be versioned using simple semantic versioning of the form `x.y.z` where `x`, `y`, and `z` are integers.
 
 ### Input Schema
 
-- **`input_schema`** (required): Describes the input parameters for the tool.
+- **`input_schema`** (required): Describes the input parameters for the tool. An object with the following properties:
 
   - **`parameters`** (required): A JSON Schema object that describes the input parameters for the tool.
     This schema supports standard JSON Schema validation, but excludes `$ref` and nested definitions/schemas for simplicity.
@@ -30,20 +30,20 @@ The `parameters` field MUST be present, and MAY be an empty object. Each paramet
 
 ### Requirements
 
-- **`requirements`** (optional): Describes tool requirements that are not strictly input parameters, such as an API key needed to call a target API, or that a tool requires OAuth 2.0-based authorization.
+- **`requirements`** (optional): Describes tool requirements that are not strictly input parameters, such as an API key needed to call a target API, or that a tool requires OAuth 2.0-based authorization. The object MAY contain the following fields:
 
-  - **`authorization`** (optional): Declares one or more required authorization methods, described as an array of objects with the following properties:
+  - **`authorization`** (array, optional): Declares one or more required authorization methods, described as an array of objects with the following properties:
 
-    - **`id`**: A unique identifier for the authorization method or authorization provider.
+    - **`id`** (string): A unique identifier for the authorization method or authorization provider.
     - **`oauth2`** (optional): For tools that need OAuth 2.0-based authorization, this field contains the OAuth 2.0-specific authorization details.
 
-      - **`scopes`**: A list of scopes that must be granted for the tool to execute properly.
+      - **`scopes`** (array of strings): A list of scopes that must be granted for the tool to execute properly.
 
-  - **`secrets`** (optional): Declares one or more secrets, described as an array of objects with the following properties:
+  - **`secrets`** (array, optional): Declares one or more secrets, described as an array of objects with the following properties:
 
-    - **`id`**: A unique identifier for the secret.
+    - **`id`** (string): A unique identifier for the secret.
 
-  - **`user_id`** (optional): A unique identifier for the user, for tools that need user identification or user-based authorization.
+  - **`user_id`** (boolean, optional): `true` if the tool requires a user ID, `false` (or omitted) otherwise.
 
 ## Non-Normative Examples
 

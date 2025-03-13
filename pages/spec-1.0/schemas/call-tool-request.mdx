@@ -6,14 +6,14 @@ The `CallToolRequest` schema encapsulates the details of a tool call (execution 
 
 ### Run and Execution Identification
 
-- **`tool_id`**: The unique identifier of the tool to call.
-- **`call_id`** (optional): A unique identifier and idempotency key for this tool call.
+- **`tool_id`** (string, required): The unique identifier of the tool to call.
+- **`call_id`** (string, optional): A unique identifier and idempotency key for this tool call.
   If not provided, the server will generate one and return it in the response.
-- **`trace_id`** (optional): Unique trace or span identifier for tracing purposes..
+- **`trace_id`** (string, optional): Unique trace or span identifier for tracing purposes..
 
 ### Input Parameters
 
-- **`inputs`**: An unconstrained object containing the parameters needed by the tool.
+- **`inputs`** (object, required): An unconstrained object containing the parameters needed by the tool.
 
 ### Context
 
@@ -21,14 +21,14 @@ If the `requirements` field is present on a given [tool definition](tool-definit
 the client MUST provide the required information in the `context` field when calling the tool.
 See the [call tool flow](../protocol/call-tool) section for more details.
 
-- **`context`** (optional): Provides additional execution context, consisting of:
-  - **`authorization`** (optional): Contains tokens for authentication, described as an array of objects with the following properties:
-    - **`id`**: The unique identifier for the authorization method or authorization provider.
-    - **`token`**: The authorization token.
-  - **`secrets`** (optional): Contains secrets for the tool call, described as an array of objects with the following properties:
-    - **`id`**: The unique identifier for the secret.
-    - **`value`**: The secret value.
-  - **`user_id`** (optional): The unique identifier for the user.
+- **`context`** (object, optional): Provides additional execution context, consisting of:
+  - **`authorization`** (array, optional): Contains tokens for authentication, described as an array of objects with the following properties:
+    - **`id`** (string): The unique identifier for the authorization method or authorization provider.
+    - **`token`** (string): The authorization token.
+  - **`secrets`** (array, optional): Contains secrets for the tool call, described as an array of objects with the following properties:
+    - **`id`** (string): The unique identifier for the secret.
+    - **`value`** (string): The secret value.
+  - **`user_id`** (string, optional): The unique identifier for the user.
 
 If the `requirements.authorization` field is present on a given tool definition, the client MUST provide the required authorization information in the `context.authorization` field when [calling the tool](../protocol/call-tool).
 
