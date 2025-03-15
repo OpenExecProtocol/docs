@@ -9,23 +9,23 @@ const config: DocsThemeConfig = {
   head: () => {
     return (
       <>
-        <title>Open Tool Calling</title>
+        <title>Open eXecution Protocol (OXP)</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="The Open Tool Calling specification"
+          content="The Open eXecution Protocol (OXP) specification"
         />
-        <meta name="og:title" content="Open Tool Calling" />
+        <meta name="og:title" content="Open eXecution Protocol (OXP)" />
         <meta
           name="og:description"
-          content="The Open Tool Calling specification"
+          content="The Open eXecution Protocol (OXP) specification"
         />
-        <meta name="og:url" content="https://opentoolcalling.org" />
+        <meta name="og:url" content="https://openexecprotocol.org" />
       </>
     );
   },
   footer: {
-    text: 'Open Tool Calling',
+    text: 'Open eXecution Protocol (OXP)',
   },
 };
 

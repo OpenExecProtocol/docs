@@ -10,12 +10,12 @@ Clients perform tool discovery by retrieving tool definitions from the Tool Serv
 - **Endpoint:** `/tools`
 - **Security:** Servers MAY require bearer authentication (JWT). Servers that are internet-facing SHOULD require authentication.
 - **Payload:** A JSON document containing:
-  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of the OTC standard that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of the OTC standard.
+  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of OXP that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of OXP.
 
 **Response:**
 
 - **Status Code:** 200 OK
-  - **Content:** A JSON object that includes a `$schema` URI reference (indicating the [OTC version](../versioning)) and a `tools` array. Each element in the array is a complete [Tool Definition](../schemas/tool-definition). If there are no tools available, the `tools` array MUST be empty.
+  - **Content:** A JSON object that includes a `$schema` URI reference (indicating the [OXP version](../versioning)) and a `tools` array. Each element in the array is a complete [Tool Definition](../schemas/tool-definition). If there are no tools available, the `tools` array MUST be empty.
 
 ## Non-Normative Example
 
@@ -33,7 +33,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ```json
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "tools": []
 }
 ```
@@ -42,7 +42,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ```json
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "tools": [
     {
       "id": "Calculator.Add@1.0.0",

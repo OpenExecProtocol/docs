@@ -1,6 +1,6 @@
 # Server Authentication
 
-Server authentication describes how the server authenticates the client: which clients are allowed to make OTC requests to the Tool Server.
+Server authentication describes how the server authenticates the client: which clients are allowed to make OXP requests to the Tool Server.
 
 Servers that are internet-facing SHOULD require authentication.
 
@@ -16,7 +16,7 @@ A static API key is a simple shared secret that both the client and server know.
 
 Requirements:
 
-- The client MUST include the API key in the `OTC-API-Key` HTTP header with each request.
+- The client MUST include the API key in the `OXP-API-Key` HTTP header with each request.
 - Servers that support this authentication method MUST validate the API key against their stored value.
 - Clients and servers MUST transmit API keys only over secure connections (HTTPS).
 - Servers MUST reject requests with missing or invalid API keys with a 401 Unauthorized HTTP response.
@@ -27,7 +27,7 @@ Requirements:
 ```http
 GET /tools HTTP/1.1
 Host: api.example.com
-OTC-API-Key: ahf62jd81hdk19akqnd62hdka
+OXP-API-Key: ahf62jd81hdk19akqnd62hdka
 ```
 
 ### JWT Bearer Token Authentication
