@@ -1,6 +1,6 @@
-# Open Tool Calling docs
+# Open eXecution Protocol (OXP) docs
 
-:globe_with_meridians: Live on [opentoolcalling.org](https://opentoolcalling.org)
+:globe_with_meridians: Live on [openexecprotocol.org](https://openexecprotocol.org)
 
 ## Development
 

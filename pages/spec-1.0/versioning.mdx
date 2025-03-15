@@ -1,6 +1,6 @@
 # Versioning
 
-The Open Tool Calling standard defines a versioning mechanism for the protocol messages exchanged between clients and tool servers.
+The Open eXecution Protocol defines a versioning mechanism for the protocol messages exchanged between clients and tool servers.
 
 ## Schema Versioning
 
@@ -11,11 +11,11 @@ The [OpenAPI schema](https://github.com/OpenToolCalling/Specification/tree/main/
 
 ## Protocol Message Versioning
 
-The `$schema` field is used in requests and responses to indicate the version of the OTC standard that the client supports. The schema URI MUST be a valid URI.
+The `$schema` field is used in requests and responses to indicate the version of OXP that the client supports. The schema URI MUST be a valid URI.
 
-If the `$schema` field is not included, the server MUST assume the client supports the latest version of the OTC standard supported by the server.
+If the `$schema` field is not included, the server MUST assume the client supports the latest version of OXP supported by the server.
 
-For example, the following request indicates that the client supports this version (1.0) of the OTC standard:
+For example, the following request indicates that the client supports this version (1.0) of OXP:
 
 ```json
 {
@@ -28,13 +28,13 @@ For example, the following request indicates that the client supports this versi
 To reduce the size of the `$schema` field, the client MAY use a shorthand version of the form:
 
 ```
-otc://<major>.<minor>
+urn:oxp:<major>.<minor>
 ```
 
-For example, the following request indicates that the client supports this version (1.0) of the OTC standard:
+For example, the following request indicates that the client supports this version (1.0) of OXP:
 
 ```json
 {
-  "$schema": "otc://1.0"
+  "$schema": "urn:oxp:1.0"
 }
 ```

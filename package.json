@@ -1,7 +1,7 @@
 {
   "name": "opentoolcalling-docs",
   "version": "1.0.0",
-  "description": "Open Tool Calling docs",
+  "description": "Open eXecution Protocol (OXP) docs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

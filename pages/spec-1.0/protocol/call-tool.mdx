@@ -11,7 +11,7 @@ This flow lets clients call a tool and receive its output, with the request and 
 - **Endpoint:** `/tools/call`
 - **Security:** Servers MAY require bearer authentication (JWT). Servers that are internet-facing SHOULD require authentication.
 - **Payload:** A JSON document containing:
-  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of the OTC standard that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of the OTC standard.
+  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of OXP that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of OXP.
   - **`request` Object:** A JSON document following the [Call Tool Request](../schemas/call-tool-request) schema.
 
 **Response (Tool Execution):**
@@ -52,7 +52,7 @@ Servers MUST differentiate between:
 If an error occurs before the tool is called that is not related to input validation, the server MUST return a 400 response conforming to the [Server Error Response](../schemas/errors#servererrorresponse) schema. Examples of such errors include:
 
 - The tool server is temporarily unavailable.
-- The requested version of the OTC standard is not supported.
+- The requested version of OXP is not supported.
 - The requested tool ID is invalid or cannot be found.
 - The requested tool version is not available.
 - The tool server requires authentication, but the client did not provide valid credentials.
@@ -90,7 +90,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "request": {
     "call_id": "123e4567-e89b-12d3-a456-426614174000",
     "tool_id": "Calculator.Add@1.0.0",
@@ -109,7 +109,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "result": {
     "call_id": "123e4567-e89b-12d3-a456-426614174000",
     "duration": 2,
@@ -132,7 +132,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "request": {
     "call_id": "123e4567-e89b-12d3-a456-426614174000",
     "tool_id": "Calculator.Add@2.0.0"
@@ -147,7 +147,7 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "message": "Tool 'Calculator_Add' was not found",
   "developer_message": "Calculator.Add version 2.0.0 is not available"
 }
@@ -166,7 +166,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "request": {
     "call_id": "123e4567-e89b-12d3-a456-426614174000",
     "tool_id": "Calculator.Add@1.0.0",
@@ -185,7 +185,7 @@ HTTP/1.1 422 Unprocessable Entity
 Content-Type: application/json
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "message": "Some input parameters are invalid",
   "parameter_errors": {
     "b": "Must be a number"
@@ -206,7 +206,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "request": {
     "call_id": "723e4567-e89b-12d3-a456-426614174006",
     "tool_id": "Doorbell.Ring@0.1.0",
@@ -224,7 +224,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "$schema": "otc://1.0",
+  "$schema": "urn:oxp:1.0",
   "result": {
      "call_id": "723e4567-e89b-12d3-a456-426614174006",
      "duration": 60,
