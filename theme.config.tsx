@@ -58,6 +58,22 @@ const config: DocsThemeConfig = {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-DFGXFEC380"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            if (typeof window !== 'undefined') {
+              window.dataLayer = window.dataLayer || [];
+              function gtag() { window.dataLayer.push(arguments); }
+              gtag('js', new Date());
+              gtag('config', 'G-DFGXFEC380');
+            }
+          `,
+          }}
+        />
       </>
     );
   },
