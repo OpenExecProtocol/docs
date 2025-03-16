@@ -1,3 +1,4 @@
+import { Footer } from '@components/Footer';
 import { Logo } from '@components/Logo';
 import { DocsThemeConfig } from 'nextra-theme-docs';
 
@@ -61,7 +62,7 @@ const config: DocsThemeConfig = {
     );
   },
   footer: {
-    text: 'Open eXecution Protocol (OXP)',
+    component: Footer,
   },
 };
 
