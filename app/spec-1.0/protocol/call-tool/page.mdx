@@ -10,23 +10,31 @@ This flow lets clients call a tool and receive its output, with the request and 
 - **Method:** POST
 - **Endpoint:** `/tools/call`
 - **Security:** Servers MAY require bearer authentication (JWT). Servers that are internet-facing SHOULD require authentication.
-- **Payload:** A JSON document containing:
-  - **`$schema` Field** (optional): The client MAY include a `$schema` field in the request body to indicate the version of OXP that the client supports. If the `$schema` field is not included, the server MUST assume the client supports the latest version of OXP.
-  - **`request` Object:** A JSON document following the [Call Tool Request](../schemas/call-tool-request) schema.
+- **Headers:**
+  - `OXP-Version` (optional, string): The [version](../versioning) of OXP that the client supports. If not provided, the server MAY assume the client supports the latest version of OXP.
+- **Payload:** A JSON document following the [Call Tool Request](../schemas/call-tool-request) schema.
 
 **Response (Tool Execution):**
 
 - **Status Code:** 200 OK
-- **Content:** A JSON document following the [Call Tool Response](../schemas/call-tool-response) schema. The server MUST return a 200 response even if the tool call fails.
+- **Headers:**
+  - `OXP-Version` (string): The [version](../versioning) of OXP used by the server.
+- **Content:** A JSON document following the [Call Tool Response](../schemas/call-tool-response) schema.
+
+The server MUST return a 200 response, even if the tool call encounters an error.
 
 **Response (Server Error):**
 
 - **Status Code:** 400
+- **Headers:**
+  - `OXP-Version` (string): The version of OXP used by the server.
 - **Content:** A JSON document following the `ServerErrorResponse` schema.
 
 **Response (Input Validation Error):**
 
 - **Status Code:** 422
+- **Headers:**
+  - `OXP-Version` (string): The version of OXP used by the server.
 - **Content:** A JSON document following the `ValidationErrorResponse` schema.
 
 ## Tool Version Resolution
@@ -49,15 +57,25 @@ Servers MUST differentiate between:
 
 ### Server Errors
 
-If an error occurs before the tool is called that is not related to input validation, the server MUST return a 400 response conforming to the [Server Error Response](../schemas/errors#servererrorresponse) schema. Examples of such errors include:
+If an error occurs before the tool is called that is not related to input validation, the server MUST return a 400 response conforming to the [Server Error Response](../schemas/errors#server-error-response) schema. Examples of such errors include:
 
 - The tool server is temporarily unavailable.
 - The requested version of OXP is not supported.
 - The requested tool ID is invalid or cannot be found.
 - The requested tool version is not available.
-- The tool server requires authentication, but the client did not provide valid credentials.
+- The tool server requires authentication, but the client did not provide valid credentials (see below, Tool Authorization Challenges).
 
 The `message` field MUST be present and SHOULD be a user-facing error message. The `developer_message` field MAY be present and SHOULD be an internal message that can be logged but will not be shown to the user or an AI model.
+
+### Tool Authorization Challenges
+
+If a tool requires authorization that has not been completed, the server MUST return a 400 response conforming to the Server Error Response's [Tool Authorization Challenge](../schemas/errors#tool-authorization-challenge) schema, with a `missing_requirements.authorization` array.
+
+The client SHOULD display the `url` to the user to complete the authorization challenge.
+
+The client MAY poll the `check_url` to check the status of the authorization challenge. The `check_url` endpoint MUST return a 200 response containing a JSON document conforming to the [Authorization Challenge Check Response](../schemas/errors#authorization-challenge-check-response) schema.
+
+If the challenge is completed, the client MAY retry the tool call.
 
 ### Input Validation Errors
 
@@ -86,18 +104,15 @@ The following examples are non-normative and are provided to illustrate the use 
 ```http
 POST /call HTTP/1.1
 Host: api.example.com
-Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
 
 {
-  "$schema": "urn:oxp:1.0",
-  "request": {
-    "call_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tool_id": "Calculator.Add@1.0.0",
-    "input": {
-      "a": 10,
-      "b": 5
-    }
+  "call_id": "123e4567-e89b-12d3-a456-426614174000",
+  "tool_id": "Calculator.Add@1.0.0",
+  "input": {
+    "a": 10,
+    "b": 5
   }
 }
 ```
@@ -107,15 +122,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+OXP-Version: 1.0
 
 {
-  "$schema": "urn:oxp:1.0",
-  "result": {
-    "call_id": "123e4567-e89b-12d3-a456-426614174000",
-    "duration": 2,
-    "success": true,
-    "value": 15
-  }
+  "call_id": "123e4567-e89b-12d3-a456-426614174000",
+  "duration": 2,
+  "success": true,
+  "value": 15
 }
 ```
 
@@ -128,15 +141,12 @@ In this example, the tool call fails because the tool version is not found.
 ```http
 POST /call HTTP/1.1
 Host: api.example.com
-Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
 
 {
-  "$schema": "urn:oxp:1.0",
-  "request": {
-    "call_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tool_id": "Calculator.Add@2.0.0"
-  }
+  "call_id": "123e4567-e89b-12d3-a456-426614174000",
+  "tool_id": "Calculator.Add@2.0.0"
 }
 ```
 
@@ -145,9 +155,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```http
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
+OXP-Version: 1.0
 
 {
-  "$schema": "urn:oxp:1.0",
   "message": "Tool 'Calculator_Add' was not found",
   "developer_message": "Calculator.Add version 2.0.0 is not available"
 }
@@ -162,18 +172,15 @@ In this example, the tool call fails because the second input parameter is not a
 ```http
 POST /call HTTP/1.1
 Host: api.example.com
-Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
 
 {
-  "$schema": "urn:oxp:1.0",
-  "request": {
-    "call_id": "123e4567-e89b-12d3-a456-426614174000",
-    "tool_id": "Calculator.Add@1.0.0",
-    "input": {
-      "a": 10,
-      "b": "infinity"
-    }
+  "call_id": "123e4567-e89b-12d3-a456-426614174000",
+  "tool_id": "Calculator.Add@1.0.0",
+  "input": {
+    "a": 10,
+    "b": "infinity"
   }
 }
 ```
@@ -183,9 +190,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```http
 HTTP/1.1 422 Unprocessable Entity
 Content-Type: application/json
+OXP-Version: 1.0
 
 {
-  "$schema": "urn:oxp:1.0",
   "message": "Some input parameters are invalid",
   "parameter_errors": {
     "b": "Must be a number"
@@ -202,17 +209,14 @@ In this example, the tool call fails because the doorbell ID is not found. The t
 ```http
 POST /call HTTP/1.1
 Host: api.example.com
-Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
 
 {
-  "$schema": "urn:oxp:1.0",
-  "request": {
-    "call_id": "723e4567-e89b-12d3-a456-426614174006",
-    "tool_id": "Doorbell.Ring@0.1.0",
-    "input": {
-      "doorbell_id": "doorbell1"
-    }
+  "call_id": "723e4567-e89b-12d3-a456-426614174006",
+  "tool_id": "Doorbell.Ring@0.1.0",
+  "input": {
+    "doorbell_id": "doorbell1"
   }
 }
 ```
@@ -222,20 +226,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+OXP-Version: 1.0
 
 {
-  "$schema": "urn:oxp:1.0",
-  "result": {
-     "call_id": "723e4567-e89b-12d3-a456-426614174006",
-     "duration": 60,
-     "success": false,
-     "error": {
-       "message": "Doorbell ID not found",
-       "developer_message": "The doorbell with ID 'doorbell1' does not exist.",
-       "can_retry": true,
-       "additional_prompt_content": "ids: doorbell42,doorbell84",
-       "retry_after_ms": 500
-     }
-   }
+  "call_id": "723e4567-e89b-12d3-a456-426614174006",
+  "duration": 60,
+  "success": false,
+  "error": {
+    "message": "Doorbell ID not found",
+    "developer_message": "The doorbell with ID 'doorbell1' does not exist.",
+    "can_retry": true,
+    "additional_prompt_content": "ids: doorbell42,doorbell84",
+    "retry_after_ms": 500
+  }
 }
 ```

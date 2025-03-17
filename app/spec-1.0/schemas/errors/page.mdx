@@ -5,19 +5,80 @@ The Open eXecution Protocol defines several error schemas that are used to repre
 ## Server Error Response
 
 The `ServerErrorResponse` schema is used to represent errors that occur before the tool is called.
-These errors typically indicate issues such as authentication failures or configuration problems. The schema includes:
+These errors typically indicate issues such as authentication challenges or configuration problems. The schema includes:
 
-- **`$schema`** (optional): The URI for the schema definition.
-- **`message`** (required): A descriptive error message. `message` SHOULD be a user-facing error message.
-- **`developer_message`** (optional): Additional internal details for debugging purposes. `developer_message` SHOULD NOT be shown to the user or an AI model.
+- **`message`** (required, string): A descriptive error message. `message` SHOULD be a user-facing error message.
+- **`developer_message`** (optional, string): Additional internal details for debugging purposes. `developer_message` SHOULD NOT be shown to the user or an AI model.
+- **`missing_requirements`** (optional, object): A map of missing requirements that must be fulfilled before the tool can be called.
+  - **`authorization`** (optional, array): A list of authorization challenges that must be completed before the tool can be called, conforming to the `ToolAuthorizationChallenge` schema (below).
+  - **`user_id`** (optional, boolean): Whether the tool requires a user ID to be called.
+
+### Tool Authorization Challenge
+
+The `ToolAuthorizationChallenge` schema is used to represent a challenge that must be completed before a tool can be called. This schema includes:
+
+- **`id`** (required, string): A unique identifier for the authorization challenge.
+- **`url`** (required, string): The URL the user must visit to complete the authorization challenge.
+- **`check_url`** (optional, string): The URL to check the status of the authorization challenge.
+
+Authorization challenges are returned in the `missing_requirements.authorization` field of the error response when a tool requires authorization that has not been completed.
+
+### Authorization Challenge Check Response
+
+The `AuthorizationChallengeCheckResponse` schema is used to represent the response to a tool authorization challenge check request. This schema includes:
+
+- **`status`** (required, enum): The status of the authorization challenge. The possible values are:
+  - `"pending"`: The challenge is still pending.
+  - `"completed"`: The challenge is now complete.
+  - `"failed"`: The challenge has failed.
+
+### Non-Normative Examples
+
+A server response indicating that the tool requires authorization:
+
+```json
+{
+  "message": "Authorization required",
+  "missing_requirements": {
+    "authorization": [
+      {
+        "id": "challenge-123",
+        "url": "https://oauth.example.com/oauth2/authorize",
+        "check_url": "https://agent.example.com/oauth2/check"
+      }
+    ]
+  }
+}
+```
+
+A response from the provided `check_url` indicating that the challenge is now complete:
+
+```json
+{
+  "status": "completed"
+}
+```
 
 ## Input Validation Error Response
 
 The `ValidationErrorResponse` schema is used to represent errors that occur when the input parameters for a tool call are invalid. This schema includes:
 
-- **`$schema`** (optional): The URI for the schema definition.
 - **`message`** (required): A descriptive error message. `message` SHOULD be a user-facing error message.
 - **`parameter_errors`** (optional): A map associating parameter names with their respective error messages to help pinpoint issues in the input data.
+
+### Examples
+
+**Parameter Validation Error:**
+
+```json
+{
+  "message": "Invalid input parameters",
+  "parameter_errors": {
+    "to": "Phone number must be in E.164 format",
+    "message": "Message cannot be empty"
+  }
+}
+```
 
 ## Tool Execution Errors
 
