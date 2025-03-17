@@ -11,30 +11,10 @@ The [OpenAPI schema](https://github.com/OpenToolCalling/Specification/tree/main/
 
 ## Protocol Message Versioning
 
-The `$schema` field is used in requests and responses to indicate the version of OXP that the client supports. The schema URI MUST be a valid URI.
+The `OXP-Version` header is used in requests and responses to indicate the version of OXP that the client supports. The header value MUST be a valid semantic version. For example:
 
-If the `$schema` field is not included, the server MUST assume the client supports the latest version of OXP supported by the server.
-
-For example, the following request indicates that the client supports this version (1.0) of OXP:
-
-```json
-{
-  "$schema": "https://github.com/OpenToolCalling/Specification/tree/main/spec/http/1.0/openapi.json"
-}
+```http
+OXP-Version: 1.0
 ```
 
-### Shorthand Versioning
-
-To reduce the size of the `$schema` field, the client MAY use a shorthand version of the form:
-
-```
-urn:oxp:<major>.<minor>
-```
-
-For example, the following request indicates that the client supports this version (1.0) of OXP:
-
-```json
-{
-  "$schema": "urn:oxp:1.0"
-}
-```
+If the `OXP-Version` header is not included, the server MAY assume the client supports the latest version of OXP supported by the server.

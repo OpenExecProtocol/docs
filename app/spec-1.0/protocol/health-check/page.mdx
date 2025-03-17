@@ -9,10 +9,14 @@ An OXP server MUST implement a health check endpoint that returns a 200 OK respo
 - **Method:** GET
 - **Endpoint:** `/health`
 - **Security:** No authentication is required.
+- **Headers:**
+  - `OXP-Version` (optional, string): The [version](../versioning) of OXP that the client supports. If not provided, the server MAY assume the client supports the latest version of OXP.
 
 **Response:**
 
 - **Status Code:** 200 OK
+- **Headers:**
+  - `OXP-Version` (string): The [version](../versioning) of OXP used by the server.
 
 If the server is ready to receive tool calls, the server MUST return a 200 OK response. The server MAY return an HTTP 503 response if it is not ready to receive tool calls.
 
@@ -30,4 +34,5 @@ GET /health HTTP/1.1
 
 ```http
 HTTP/1.1 200 OK
+OXP-Version: 1.0
 ```

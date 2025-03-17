@@ -145,3 +145,43 @@ The following examples are non-normative and are provided to illustrate the use 
      }
    }
    ```
+
+8. **Error Response with Missing User ID Requirement**
+
+   An error response indicating that a user ID is required before the tool can be called.
+
+   ```json
+   {
+     "call_id": "823e4567-e89b-12d3-a456-426614174007",
+     "success": false,
+     "error": {
+       "message": "User ID required before this tool can be called",
+       "can_retry": true,
+       "missing_requirements": {
+         "user_id": true
+       }
+     }
+   }
+   ```
+
+   An error response indicating that authorization is required before the tool can be called.
+
+   ```json
+   {
+     "call_id": "823e4567-e89b-12d3-a456-426614174007",
+     "success": false,
+     "error": {
+       "message": "Authorization required before this tool can be called",
+       "can_retry": true,
+       "missing_requirements": {
+         "authorization": [
+           {
+             "id": "google_auth123",
+             "url": "https://auth.example.com/authorize?service=google",
+             "check_url": "https://auth.example.com/check?id=google_auth123"
+           }
+         ]
+       }
+     }
+   }
+   ```

@@ -15,12 +15,12 @@ Tools MUST be versioned using simple semantic versioning of the form `x.y.z` whe
 
 ### Input Schema
 
-- **`input_schema`** (required): Describes the input parameters for the tool. An object with the following properties:
+- **`input_schema`** (required): A JSON Schema object that describes the input parameters for the tool.
+  This schema supports standard JSON Schema validation, but excludes `$ref` and nested definitions/schemas for simplicity.
 
-  - **`parameters`** (required): A JSON Schema object that describes the input parameters for the tool.
-    This schema supports standard JSON Schema validation, but excludes `$ref` and nested definitions/schemas for simplicity.
+The `input_schema` MUST be a valid JSON Schema object and SHOULD contain a JSON-Schema `properties` object with descriptions for all properties, if the tool requires input parameters.
 
-The `parameters` field MUST be present, and MAY be an empty object. Each parameter in `parameters` MUST be a valid JSON Schema object and MUST contain a `description` field describing the parameter.
+`input_schema` MAY be an empty object if the tool does not require input parameters.
 
 ### Output Schema
 
@@ -60,20 +60,18 @@ The following examples are non-normative and are provided to illustrate the use 
      "description": "Adds two numbers together.",
      "version": "1.0.0",
      "input_schema": {
-       "parameters": {
-         "type": "object",
-         "properties": {
-           "a": {
-             "type": "number",
-             "description": "The first number to add."
-           },
-           "b": {
-             "type": "number",
-             "description": "The second number to add."
-           }
+       "type": "object",
+       "properties": {
+         "a": {
+           "type": "number",
+           "description": "The first number to add."
          },
-         "required": ["a", "b"]
-       }
+         "b": {
+           "type": "number",
+           "description": "The second number to add."
+         }
+       },
+       "required": ["a", "b"]
      },
      "output_schema": {
        "type": "number",
@@ -93,16 +91,14 @@ The following examples are non-normative and are provided to illustrate the use 
      "description": "Rings a doorbell given a doorbell ID.",
      "version": "0.1.0",
      "input_schema": {
-       "parameters": {
-         "type": "object",
-         "properties": {
-           "doorbell_id": {
-             "type": "string",
-             "description": "The ID of the doorbell to ring."
-           }
-         },
-         "required": ["doorbell_id"]
-       }
+       "type": "object",
+       "properties": {
+         "doorbell_id": {
+           "type": "string",
+           "description": "The ID of the doorbell to ring."
+         }
+       },
+       "required": ["doorbell_id"]
      },
      "output_schema": null
    }
@@ -118,11 +114,7 @@ The following examples are non-normative and are provided to illustrate the use 
      "name": "System_GetTimestamp",
      "description": "Retrieves the current system timestamp.",
      "version": "1.0.0",
-     "input_schema": {
-       "parameters": {
-         "type": "object"
-       }
-     },
+     "input_schema": {},
      "output_schema": {
        "type": "object",
        "properties": {
@@ -148,16 +140,14 @@ The following examples are non-normative and are provided to illustrate the use 
      "description": "Retrieves emails from Gmail using OAuth 2.0 authentication.",
      "version": "1.2.0",
      "input_schema": {
-       "parameters": {
-         "type": "object",
-         "properties": {
-           "query": {
-             "type": "string",
-             "description": "Search query for filtering emails."
-           }
-         },
-         "required": []
-       }
+       "type": "object",
+       "properties": {
+         "query": {
+           "type": "string",
+           "description": "Search query for filtering emails."
+         }
+       },
+       "required": []
      },
      "output_schema": {
        "type": "object",
@@ -203,20 +193,18 @@ The following examples are non-normative and are provided to illustrate the use 
      "description": "Sends SMS messages using Twilio.",
      "version": "0.1.2",
      "input_schema": {
-       "parameters": {
-         "type": "object",
-         "properties": {
-           "to": {
-             "type": "string",
-             "description": "Recipient phone number."
-           },
-           "message": {
-             "type": "string",
-             "description": "Message content to send."
-           }
+       "type": "object",
+       "properties": {
+         "to": {
+           "type": "string",
+           "description": "Recipient phone number."
          },
-         "required": ["to", "message"]
-       }
+         "message": {
+           "type": "string",
+           "description": "Message content to send."
+         }
+       },
+       "required": ["to", "message"]
      },
      "output_schema": {
        "type": "object",
